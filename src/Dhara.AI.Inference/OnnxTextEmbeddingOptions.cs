@@ -43,9 +43,15 @@ public sealed class OnnxTextEmbeddingOptions
     public string AttentionMaskName { get; set; } = "attention_mask";
 
     /// <summary>
-    /// Gets or sets the name of the ONNX input that receives token type ids.
+    /// Gets or sets the optional name of the ONNX input that receives token type ids.
     /// </summary>
-    public string TokenTypeIdsName { get; set; } = "token_type_ids";
+    /// <remarks>
+    /// Some BERT exports require <c>token_type_ids</c> to distinguish sentence pairs.
+    /// DistilBERT-style sentence-transformer exports often omit this input. When this
+    /// value is <see langword="null"/>, or when the loaded ONNX model has no input with
+    /// this name, token type ids are not sent to the model.
+    /// </remarks>
+    public string? TokenTypeIdsName { get; set; } = "token_type_ids";
 
     /// <summary>
     /// Gets or sets an optional output name to read from the ONNX model.

@@ -71,9 +71,24 @@ public sealed class OnnxTextEmbeddingModel : IDisposable
         using var inputIds = OrtValue.CreateTensorValueFromMemory(batch.InputIds, dimensions);
         using var attentionMask = OrtValue.CreateTensorValueFromMemory(batch.AttentionMask, dimensions);
         using var tokenTypeIds = OrtValue.CreateTensorValueFromMemory(batch.TokenTypeIds, dimensions);
+        var inputNames = new List<string>(capacity: 3)
+        {
+            _options.InputIdsName,
+            _options.AttentionMaskName
+        };
+        var inputs = new List<OrtValue>(capacity: 3)
+        {
+            inputIds,
+            attentionMask
+        };
 
-        var inputNames = new[] { _options.InputIdsName, _options.AttentionMaskName, _options.TokenTypeIdsName };
-        var inputs = new[] { inputIds, attentionMask, tokenTypeIds };
+        if (_options.TokenTypeIdsName is { Length: > 0 } tokenTypeIdsName
+            && _session.InputNames.Contains(tokenTypeIdsName, StringComparer.Ordinal))
+        {
+            inputNames.Add(tokenTypeIdsName);
+            inputs.Add(tokenTypeIds);
+        }
+
         var outputNames = _options.OutputName is null ? _session.OutputNames : [_options.OutputName];
         using var output = _session.Run(new RunOptions(), inputNames, inputs, outputNames);
         var outputValue = output[0];

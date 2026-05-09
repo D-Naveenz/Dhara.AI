@@ -25,6 +25,13 @@ The package downloads the default `bge-micro-v2` ONNX model and vocabulary durin
 build. Override `LocalEmbeddingsModelUrl`, `LocalEmbeddingsVocabUrl`,
 `LocalEmbeddingsModelPath`, or `LocalEmbeddingsVocabPath` to use your own files.
 
+The runtime is not limited to the default model's 384 dimensions. It sizes
+embedding buffers from the vector returned by the ONNX model, so a 768-dimensional
+sentence-transformer model stores `768 * 4 = 3072` bytes in `EmbeddingF32`.
+Sentence-transformer exports should use mean pooling and normalized embeddings;
+this is the default behavior. DistilBERT-style exports that omit `token_type_ids`
+are supported automatically when the ONNX model does not expose that input.
+
 ## Commands
 
 ```powershell

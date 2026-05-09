@@ -62,9 +62,14 @@ public sealed class LocalEmbeddingGeneratorOptions
     public string AttentionMaskName { get; set; } = "attention_mask";
 
     /// <summary>
-    /// Gets or sets the ONNX input name for token type ids.
+    /// Gets or sets the optional ONNX input name for token type ids.
     /// </summary>
-    public string TokenTypeIdsName { get; set; } = "token_type_ids";
+    /// <remarks>
+    /// Leave this as <c>token_type_ids</c> for models that expose that input. Set it to
+    /// <see langword="null"/> for exports that never use token type ids. If the loaded
+    /// model does not contain the named input, the runtime skips it automatically.
+    /// </remarks>
+    public string? TokenTypeIdsName { get; set; } = "token_type_ids";
 
     /// <summary>
     /// Gets or sets the ONNX output name to read.
