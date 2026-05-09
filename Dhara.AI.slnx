@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Dhara.AI.Inference/Dhara.AI.Inference.csproj" />
+    <Project Path="src/Dhara.AI.LocalEmbeddings/Dhara.AI.LocalEmbeddings.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Dhara.AI.LocalEmbeddings.Test/Dhara.AI.LocalEmbeddings.Test.csproj" Id="0e9e0eb7-2255-4e7d-af57-74b41067fa6f" />
+  </Folder>
+</Solution>
