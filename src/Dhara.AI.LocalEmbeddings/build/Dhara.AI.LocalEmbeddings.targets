@@ -1,0 +1,93 @@
+<Project>
+  <PropertyGroup>
+    <!--
+      Cache downloaded model assets beside this targets file by default.
+      Consumers can override this to a shared machine/user cache if they do not
+      want each project/package copy to keep its own downloaded model files.
+    -->
+    <LocalEmbeddingsModelCacheDir Condition="'$(LocalEmbeddingsModelCacheDir)' == ''">$(MSBuildThisFileDirectory)..\.cache\</LocalEmbeddingsModelCacheDir>
+
+    <!--
+      The logical model name becomes part of the runtime output path:
+      LocalEmbeddingsModel\<LocalEmbeddingsModelName>\model.onnx
+      LocalEmbeddingsModel\<LocalEmbeddingsModelName>\vocab.txt
+
+      At runtime, LocalEmbeddingGeneratorOptions.ModelName uses this same value
+      when ModelPath and VocabularyPath are not provided explicitly.
+    -->
+    <LocalEmbeddingsModelName Condition="'$(LocalEmbeddingsModelName)' == ''">default</LocalEmbeddingsModelName>
+
+    <!--
+      Default model assets.
+
+      bge-micro-v2 is a small BERT-style embedding model that keeps local
+      development quick while still producing useful semantic search behavior.
+      The package does not redistribute the model; MSBuild downloads it into
+      the cache during build and copies it to the consuming app's output.
+    -->
+    <LocalEmbeddingsModelUrl Condition="'$(LocalEmbeddingsModelUrl)' == ''">https://huggingface.co/SmartComponents/bge-micro-v2/resolve/72908b7/onnx/model_quantized.onnx</LocalEmbeddingsModelUrl>
+    <LocalEmbeddingsVocabUrl Condition="'$(LocalEmbeddingsVocabUrl)' == ''">https://huggingface.co/SmartComponents/bge-micro-v2/resolve/72908b7/vocab.txt</LocalEmbeddingsVocabUrl>
+
+    <!--
+      If callers already have model files locally, they can set
+      LocalEmbeddingsModelPath and LocalEmbeddingsVocabPath directly. Otherwise
+      we derive stable cache filenames from the URLs by replacing characters
+      that are awkward in file names.
+    -->
+    <LocalEmbeddingsModelPath Condition="'$(LocalEmbeddingsModelPath)' == ''">$(LocalEmbeddingsModelCacheDir)$([System.Text.RegularExpressions.Regex]::Replace($(LocalEmbeddingsModelUrl), "[^a-zA-Z0-9\.]", "_"))</LocalEmbeddingsModelPath>
+    <LocalEmbeddingsVocabPath Condition="'$(LocalEmbeddingsVocabPath)' == ''">$(LocalEmbeddingsModelCacheDir)$([System.Text.RegularExpressions.Regex]::Replace($(LocalEmbeddingsVocabUrl), "[^a-zA-Z0-9\.]", "_"))</LocalEmbeddingsVocabPath>
+  </PropertyGroup>
+
+  <!--
+    Download the ONNX model only when the resolved model path does not exist.
+    This keeps repeat builds fast and allows offline builds after the first
+    successful download, provided the cache is retained.
+  -->
+  <Target Name="AcquireLocalEmbeddingsModel" Condition="!Exists('$(LocalEmbeddingsModelPath)')">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(LocalEmbeddingsModelPath)'))" />
+    <DownloadFile SourceUrl="$(LocalEmbeddingsModelUrl)"
+                  DestinationFolder="$([System.IO.Path]::GetDirectoryName('$(LocalEmbeddingsModelPath)'))"
+                  DestinationFileName="$([System.IO.Path]::GetFileName('$(LocalEmbeddingsModelPath)'))" />
+  </Target>
+
+  <!--
+    Download the vocabulary used by the BERT tokenizer. The vocabulary must
+    match the model, because token ids are model-specific.
+  -->
+  <Target Name="AcquireLocalEmbeddingsVocab" Condition="!Exists('$(LocalEmbeddingsVocabPath)')">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(LocalEmbeddingsVocabPath)'))" />
+    <DownloadFile SourceUrl="$(LocalEmbeddingsVocabUrl)"
+                  DestinationFolder="$([System.IO.Path]::GetDirectoryName('$(LocalEmbeddingsVocabPath)'))"
+                  DestinationFileName="$([System.IO.Path]::GetFileName('$(LocalEmbeddingsVocabPath)'))" />
+  </Target>
+
+  <!--
+    Attach the resolved model and vocabulary as content files before MSBuild
+    assigns target paths. Copying to the app output lets the default runtime
+    constructor find files relative to AppContext.BaseDirectory without asking
+    the application to hard-code machine-specific paths.
+  -->
+  <Target Name="AttachLocalEmbeddingsModelFiles"
+          BeforeTargets="AssignTargetPaths"
+          DependsOnTargets="AcquireLocalEmbeddingsModel;AcquireLocalEmbeddingsVocab">
+    <ItemGroup>
+      <Content CopyToOutputDirectory="PreserveNewest"
+               Include="$(LocalEmbeddingsModelPath)"
+               TargetPath="LocalEmbeddingsModel\$(LocalEmbeddingsModelName)\model.onnx" />
+      <Content CopyToOutputDirectory="PreserveNewest"
+               Include="$(LocalEmbeddingsVocabPath)"
+               TargetPath="LocalEmbeddingsModel\$(LocalEmbeddingsModelName)\vocab.txt" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Include this build file when packing Dhara.AI.LocalEmbeddings so consuming
+    projects get the same model acquisition behavior after installing the
+    NuGet package.
+  -->
+  <Target Name="PackLocalEmbeddingsBuildFiles" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_PackageFiles Include="build\**" BuildAction="Content" PackagePath="build" />
+    </ItemGroup>
+  </Target>
+</Project>

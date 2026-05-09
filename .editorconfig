@@ -8,6 +8,6 @@ indent_style = space
 [*.xml]
 indent_size = 2
 
-# Project files
-[*.csproj]
+# Project files and properties files
+[*.csproj, *.props, *.targets]
 indent_size = 2

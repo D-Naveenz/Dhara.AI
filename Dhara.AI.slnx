@@ -2,12 +2,18 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Dhara.AI.Inference/Dhara.AI.Inference.csproj" />
     <Project Path="src/Dhara.AI.LocalEmbeddings/Dhara.AI.LocalEmbeddings.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Dhara.AI.LocalEmbeddings.Sample/Dhara.AI.LocalEmbeddings.Sample.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/Dhara.AI.LocalEmbeddings.Test/Dhara.AI.LocalEmbeddings.Test.csproj" Id="0e9e0eb7-2255-4e7d-af57-74b41067fa6f" />
