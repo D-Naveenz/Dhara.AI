@@ -1,0 +1,43 @@
+<Project>
+  <PropertyGroup>
+    <DharaEmbeddingModelCacheDir Condition="'$(DharaEmbeddingModelCacheDir)' == ''">$(MSBuildThisFileDirectory)..\.cache\</DharaEmbeddingModelCacheDir>
+    <DharaEmbeddingModelName Condition="'$(DharaEmbeddingModelName)' == ''">default</DharaEmbeddingModelName>
+    <DharaEmbeddingModelUrl Condition="'$(DharaEmbeddingModelUrl)' == ''">https://huggingface.co/SmartComponents/bge-micro-v2/resolve/72908b7/onnx/model_quantized.onnx</DharaEmbeddingModelUrl>
+    <DharaEmbeddingVocabUrl Condition="'$(DharaEmbeddingVocabUrl)' == ''">https://huggingface.co/SmartComponents/bge-micro-v2/resolve/72908b7/vocab.txt</DharaEmbeddingVocabUrl>
+    <DharaEmbeddingModelPath Condition="'$(DharaEmbeddingModelPath)' == ''">$(DharaEmbeddingModelCacheDir)$([System.Text.RegularExpressions.Regex]::Replace($(DharaEmbeddingModelUrl), "[^a-zA-Z0-9\.]", "_"))</DharaEmbeddingModelPath>
+    <DharaEmbeddingVocabPath Condition="'$(DharaEmbeddingVocabPath)' == ''">$(DharaEmbeddingModelCacheDir)$([System.Text.RegularExpressions.Regex]::Replace($(DharaEmbeddingVocabUrl), "[^a-zA-Z0-9\.]", "_"))</DharaEmbeddingVocabPath>
+  </PropertyGroup>
+
+  <Target Name="AcquireDharaEmbeddingModel" Condition="!Exists('$(DharaEmbeddingModelPath)')">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(DharaEmbeddingModelPath)'))" />
+    <DownloadFile SourceUrl="$(DharaEmbeddingModelUrl)"
+                  DestinationFolder="$([System.IO.Path]::GetDirectoryName('$(DharaEmbeddingModelPath)'))"
+                  DestinationFileName="$([System.IO.Path]::GetFileName('$(DharaEmbeddingModelPath)'))" />
+  </Target>
+
+  <Target Name="AcquireDharaEmbeddingVocab" Condition="!Exists('$(DharaEmbeddingVocabPath)')">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(DharaEmbeddingVocabPath)'))" />
+    <DownloadFile SourceUrl="$(DharaEmbeddingVocabUrl)"
+                  DestinationFolder="$([System.IO.Path]::GetDirectoryName('$(DharaEmbeddingVocabPath)'))"
+                  DestinationFileName="$([System.IO.Path]::GetFileName('$(DharaEmbeddingVocabPath)'))" />
+  </Target>
+
+  <Target Name="AttachDharaEmbeddingModelFiles"
+          BeforeTargets="AssignTargetPaths"
+          DependsOnTargets="AcquireDharaEmbeddingModel;AcquireDharaEmbeddingVocab">
+    <ItemGroup>
+      <Content CopyToOutputDirectory="PreserveNewest"
+               Include="$(DharaEmbeddingModelPath)"
+               TargetPath="LocalEmbeddingsModel\$(DharaEmbeddingModelName)\model.onnx" />
+      <Content CopyToOutputDirectory="PreserveNewest"
+               Include="$(DharaEmbeddingVocabPath)"
+               TargetPath="LocalEmbeddingsModel\$(DharaEmbeddingModelName)\vocab.txt" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PackDharaEmbeddingBuildFiles" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_PackageFiles Include="build\**" BuildAction="Content" PackagePath="build" />
+    </ItemGroup>
+  </Target>
+</Project>
