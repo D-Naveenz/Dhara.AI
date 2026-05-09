@@ -22,10 +22,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/D-Naveenz/Dhara.AI</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <Authors>Dhara.AI</Authors>
-    <Company>Dhara.AI</Company>
+    <Authors>Naveen Dharmathunga</Authors>
     <Product>Dhara.AI</Product>
-    <Copyright>Copyright (c) Dhara.AI contributors</Copyright>
+    <Copyright>Copyright (c) Naveen Dharmathunga and contributors</Copyright>
     <PackageTags>ai;embeddings;onnx;native-aot;microsoft-extensions-ai</PackageTags>
   </PropertyGroup>
 
