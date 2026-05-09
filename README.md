@@ -21,6 +21,17 @@ var candidates = await generator.EmbedRangeAsync<EmbeddingF32>(
 var closest = EmbeddingSearch.FindClosestWithScore(query, candidates, maxResults: 1);
 ```
 
+Use `EmbeddingF32` when you want the raw full-precision model output. Use
+`EmbeddingI8` when you want a compact scalar-quantized value for local indexes:
+a 384-dimensional vector uses 388 bytes instead of 1,536 bytes, and a
+768-dimensional vector uses 772 bytes instead of 3,072 bytes. This is useful
+when storing many note or block embeddings for retrieval.
+
+Use `EmbeddingI1` when you need the smallest representation and can accept
+approximate Hamming-similarity ranking: a 384-dimensional vector uses 52 bytes,
+and a 768-dimensional vector uses 100 bytes. This is best for very large indexes,
+coarse filtering, or shortlist-then-rescore retrieval.
+
 The package downloads the default `bge-micro-v2` ONNX model and vocabulary during
 build. Override `LocalEmbeddingsModelUrl`, `LocalEmbeddingsVocabUrl`,
 `LocalEmbeddingsModelPath`, or `LocalEmbeddingsVocabPath` to use your own files.

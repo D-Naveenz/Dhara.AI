@@ -35,6 +35,41 @@ public sealed class LocalEmbeddingGeneratorIntegrationTests
     }
 
     [Fact]
+    public async Task EmbedRangeAsync_CanRankWithInt8Embeddings()
+    {
+        using var generator = LocalEmbeddingGenerator.Create();
+        var query = await generator.EmbedAsync<EmbeddingI8>("semantic search for Obsidian notes", cancellationToken: TestContext.Current.CancellationToken);
+        var candidates = await generator.EmbedRangeAsync<EmbeddingI8>(
+        [
+            "Smart Connections stores note and block embeddings for Obsidian vault search.",
+            "Native AOT compiles a .NET console app into a platform-specific executable.",
+            "A grocery list contains rice, tea, and milk."
+        ], TestContext.Current.CancellationToken);
+
+        var result = EmbeddingSearch.FindClosest(query, candidates, maxResults: 1);
+
+        Assert.Equal("Smart Connections stores note and block embeddings for Obsidian vault search.", result[0]);
+    }
+
+    [Fact]
+    public async Task EmbedRangeAsync_CanRankExactMatchesWithBinaryEmbeddings()
+    {
+        using var generator = LocalEmbeddingGenerator.Create();
+        const string exact = "Smart Connections stores note and block embeddings for Obsidian vault search.";
+        var query = await generator.EmbedAsync<EmbeddingI1>(exact, cancellationToken: TestContext.Current.CancellationToken);
+        var candidates = await generator.EmbedRangeAsync<EmbeddingI1>(
+        [
+            "Native AOT compiles a .NET console app into a platform-specific executable.",
+            exact,
+            "A grocery list contains rice, tea, and milk."
+        ], TestContext.Current.CancellationToken);
+
+        var result = EmbeddingSearch.FindClosest(query, candidates, maxResults: 1);
+
+        Assert.Equal(exact, result[0]);
+    }
+
+    [Fact]
     public async Task GenerateAsync_IsReusableAcrossConcurrentCalls()
     {
         using var generator = LocalEmbeddingGenerator.Create();
