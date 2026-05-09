@@ -22,8 +22,8 @@ var closest = EmbeddingSearch.FindClosestWithScore(query, candidates, maxResults
 ```
 
 The package downloads the default `bge-micro-v2` ONNX model and vocabulary during
-build. Override `DharaEmbeddingModelUrl`, `DharaEmbeddingVocabUrl`,
-`DharaEmbeddingModelPath`, or `DharaEmbeddingVocabPath` to use your own files.
+build. Override `LocalEmbeddingsModelUrl`, `LocalEmbeddingsVocabUrl`,
+`LocalEmbeddingsModelPath`, or `LocalEmbeddingsVocabPath` to use your own files.
 
 ## Commands
 
