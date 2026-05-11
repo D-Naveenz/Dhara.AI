@@ -1,6 +1,14 @@
 # Dhara.AI
 
-Modern local AI building blocks for .NET.
+Modern local AI building blocks for .NET, focused on local-first inference,
+embeddings, retrieval, and Native AOT-friendly application shapes.
+
+## Packages
+
+| Package | Purpose |
+| --- | --- |
+| [`Dhara.AI.Inference`](src/Dhara.AI.Inference/README.md) | Low-level ONNX Runtime and tokenizer primitives for local embedding models. |
+| [`Dhara.AI.LocalEmbeddings`](src/Dhara.AI.LocalEmbeddings/README.md) | `Microsoft.Extensions.AI` local embedding generator, model acquisition, compact embedding formats, and ranking helpers. |
 
 ## Local Embeddings
 
@@ -43,6 +51,18 @@ Sentence-transformer exports should use mean pooling and normalized embeddings;
 this is the default behavior. DistilBERT-style exports that omit `token_type_ids`
 are supported automatically when the ONNX model does not expose that input.
 
+## Packaging
+
+The two library projects are packable NuGet packages. Each package has its own
+README and uses `assets/branding/dhara-logo-colored_sm.png` as the NuGet icon.
+Model assets are not packed into `Dhara.AI.LocalEmbeddings`; the package ships an
+MSBuild target that downloads/copies the configured model files into consuming
+application outputs.
+
+Pushes to `master`, including merged pull requests, publish both packages
+through `.github/workflows/publish-nuget.yml`. The workflow requires a
+repository secret named `NUGET_API_KEY`.
+
 ## Commands
 
 ```powershell
@@ -50,4 +70,6 @@ dotnet build Dhara.AI.slnx
 dotnet test Dhara.AI.slnx
 dotnet run --project samples\Dhara.AI.LocalEmbeddings.Sample
 dotnet publish samples\Dhara.AI.LocalEmbeddings.Sample -c Release -r win-x64 --self-contained true
+dotnet pack src\Dhara.AI.Inference\Dhara.AI.Inference.csproj -c Release
+dotnet pack src\Dhara.AI.LocalEmbeddings\Dhara.AI.LocalEmbeddings.csproj -c Release
 ```

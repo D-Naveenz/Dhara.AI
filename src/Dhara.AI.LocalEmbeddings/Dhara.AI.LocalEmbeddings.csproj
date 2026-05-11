@@ -1,4 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Microsoft.Extensions.AI local embedding generator with ONNX inference, compact embedding formats, and ranking helpers.</Description>
+    <PackageTags>ai;embeddings;onnx;semantic-search;native-aot;microsoft-extensions-ai;local-ai</PackageTags>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />

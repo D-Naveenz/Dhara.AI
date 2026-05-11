@@ -20,6 +20,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>dhara-logo-colored_sm.png</PackageIcon>
     <PackageProjectUrl>https://github.com/D-Naveenz/Dhara.AI</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <Authors>Naveen Dharmathunga</Authors>

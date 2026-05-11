@@ -1,4 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Low-level ONNX Runtime and tokenizer primitives for local text embedding models in .NET.</Description>
+    <PackageTags>ai;embeddings;onnx;tokenizers;native-aot;local-ai</PackageTags>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" />
