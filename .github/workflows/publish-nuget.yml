@@ -1,0 +1,58 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+
+jobs:
+  publish:
+    name: Pack and publish
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore Dhara.AI.slnx
+
+      - name: Build
+        run: dotnet build Dhara.AI.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Dhara.AI.slnx --configuration Release --no-build
+
+      - name: Pack Dhara.AI.Inference
+        run: dotnet pack src\Dhara.AI.Inference\Dhara.AI.Inference.csproj --configuration Release --no-build --output artifacts\packages
+
+      - name: Pack Dhara.AI.LocalEmbeddings
+        run: dotnet pack src\Dhara.AI.LocalEmbeddings\Dhara.AI.LocalEmbeddings.csproj --configuration Release --no-build --output artifacts\packages
+
+      - name: Publish packages
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
+            throw "NUGET_API_KEY secret is required to publish packages."
+          }
+
+          Get-ChildItem -LiteralPath artifacts\packages -Filter *.nupkg |
+            Where-Object { $_.Name -notlike "*.symbols.nupkg" } |
+            ForEach-Object {
+              dotnet nuget push $_.FullName --source $env:NUGET_SOURCE --api-key $env:NUGET_API_KEY --skip-duplicate
+            }
